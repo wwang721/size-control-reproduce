@@ -209,7 +209,8 @@ __marimo__/
 # Custom ignore rules
 slurm-*
 variances/data/rs*
+2D_simulations/frames/*.png
 2D_simulations/data/va*
 survival/data/data*
 survival/change_kd/data*
-
+.DS_Store
