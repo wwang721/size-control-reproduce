@@ -9,8 +9,8 @@ These are the code and data required to reproduce the results in the paper:
 
 Preprint version available on **arXiv**: [arXiv:2503.03126](https://doi.org/10.48550/arXiv.2503.03126).
 
-
-This code is only intended to help in reproducing our results and explaining our methods fully - attempting to generalize without full understanding may lead to unpredictable issues or errors.
+> [!CAUTION]
+> This code is only intended to help in reproducing our results and explaining our methods fully - attempting to generalize without full understanding may lead to unpredictable issues or errors.
 
 
 ## Analytical results
@@ -25,7 +25,7 @@ The code was run with **Python 3.11.11** and the following packages:
 | Package    | Version | Usage                                                                           |
 | :--------- | :-----: | :------------------------------------------------------------------------------ |
 | numpy      | 2.1.3   | Numerical computations                                                          |
-| scipy      | 1.5.3   | Miscellaneous scientific functions                                              |
+| scipy      | 1.15.3  | Miscellaneous scientific functions                                              |
 | matplotlib | 3.10.0  | Plotting and visualization                                                      |
 | tqdm       | 4.67.1  | Progress bars during calculations                                               |
 | mpi4py     | 4.0.3   | Parallel processing using MPI                                                   |
@@ -37,7 +37,10 @@ The code was run with **Python 3.11.11** and the following packages:
 
 ### Figure 2
 
-For panel (b), the AOUP simulation code is located at [variances/NAOUPs.py](/variances/NAOUPs.py). Jobs are submitted using [script.slurm](/variances/script.slurm). The output data are written to [variances/data](/variances/data) and contain the final particle positions for each run. The figure is generated using [variance/plot.py](/variances/plot.py). For small values of the persistence time $\tau$, the first few data points may exhibit increased noise because $\tau$ approaches the default integration time step $\Delta t$. In this regime, reducing the time step (using line 16 and commenting out line 13 in [NAOUPs.py](/variances/NAOUPs.py) for small $\tau$) and averaging over multiple runs is necessary to obtain reliable results.
+For panel (b), the AOUP simulation code is located at [variances/NAOUPs.py](/variances/NAOUPs.py). Jobs are submitted using [script.slurm](/variances/script.slurm). The output data are written to [variances/data](/variances/data) and contain the final particle positions for each run. The figure is generated using [variance/plot.py](/variances/plot.py).
+
+> [!NOTE]
+> For small values of the persistence time $\tau$, the first few data points may exhibit increased noise because $\tau$ approaches the default integration time step $\Delta t$. In this regime, reducing the time step (using line 16 and commenting out line 13 in [NAOUPs.py](/variances/NAOUPs.py) for small $\tau$) and averaging over multiple runs is necessary to obtain reliable results.
 
 For panel (c), the code used to compute the mean first-passage time is located in the directory [MFPT](/MFPT). Each subdirectory corresponds to varying a single parameter. Submit the `script.slurm` file within each subdirectory to run the simulations. The resulting escape times $\tau_\mathrm{esc}$ are saved as `res.npy` files. Running [MFPT/plot.py](/MFPT/plot.py) aggregates these results and generates the figure.
 
@@ -61,7 +64,7 @@ The 2D AOUP simulations are located in [2D_simulations](/2D_simulations) directo
 
 ![2D simulation](/2D_simulations/2d_sim.gif)
 
-Submit [2D_simulations/script.slurm](/2D_simulations/script.slurm) to run [scan_va.py](/2D_simulations/script.slurm), which scans the parameter space over the active velocity $v_a$ and saves the results to [2D_simulations/data](/2D_simulations/data). The scripts in [2D_simulations/analysis](/2D_simulations/analysis) process these data to generate panels in Fig. 7, including fracture rates, histograms, cluster-size distributions, and survival probabilities.
+Submit [2D_simulations/script.slurm](/2D_simulations/script.slurm) to run [scan_va.py](/2D_simulations/scan_va.py), which scans the parameter space over the active velocity $v_a$ (denoted $v_\textrm{rms}$ in the paper) and saves the results to [2D_simulations/data](/2D_simulations/data). The scripts in [2D_simulations/analysis](/2D_simulations/analysis) process these data to generate panels in Fig. 7, including fracture rates, histograms, cluster-size distributions, and survival probabilities.
 
 
 ### Other figures
@@ -74,6 +77,9 @@ All remaining figures are either purely theoretical or minor variants of the fig
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18485014.svg)](https://doi.org/10.5281/zenodo.18485014)
 
 - This repository is also archived and cross-listed on [Zenodo](https://doi.org/10.5281/zenodo.18485014).
+- The authors acknowledge support from the National Institutes of Health (NIH) Grant No. R35GM142847.
+- This work was carried out at the Advanced Research Computing at Hopkins (ARCH) core facility, which is supported by the National Science Foundation (NSF) Grant No. OAC1920103.
+
 
 ## License
 
