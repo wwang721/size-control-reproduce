@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.png'
+      - '**/*.slurm'
+
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.png'
+      - '**/*.slurm'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  test-plots:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          uv pip install numpy==2.1.3 matplotlib==3.10.0 scipy==1.15.3
+
+      # Strongly recommended if you use matplotlib:
+      - name: Force headless plotting backend
+        run: |
+          echo "MPLBACKEND=Agg" >> $GITHUB_ENV
+
+      # Option A: run every script under a folder (e.g. plots/)
+      - name: Run python scripts
+        run: |
+          uv run python --version
+
+          cd MFPT
+          uv run plot.py
+
+          cd ../distributions
+          uv run plot.py
+          cd min_N
+          uv run plot.py
+
+      # Optionally: verify output files were created (edit paths as needed)
+      # - name: Check plot outputs exist
+      #   run: |
+      #     test -f outputs/figure1.png
+      #     test -f outputs/figure2.pdf

@@ -2,6 +2,7 @@
 
 [![PRE Paper](https://img.shields.io/badge/DOI-10.1103%2Fdk15--hwzg-blue)](https://doi.org/10.1103/dk15-hwzg)
 [![arXiv:2503.03126](https://img.shields.io/badge/arXiv-2503.03126-grey.svg?colorB=a42c25&logo=arxiv)](https://doi.org/10.48550/arXiv.2503.03126)
+[![CI](https://github.com/wwang721/size-control-reproduce/actions/workflows/ci.yml/badge.svg)](https://github.com/wwang721/size-control-reproduce/actions/workflows/ci.yml)
 
 These are the code and data required to reproduce the results in the paper:
 
