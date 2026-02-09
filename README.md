@@ -16,7 +16,7 @@ Preprint version available on **arXiv**: [arXiv:2503.03126](https://doi.org/10.4
 
 ## Analytical results
 
-Detailed analytical derivations of the generating functions are provided in the **Mathematica** notebook [generating_functions.nb](/generating_functions.nb).
+Detailed analytical derivations of the generating functions are provided in the **Mathematica** notebook [generating_functions.nb](/generating_functions.nb) (preview available as a [PDF](/generating_functions.pdf)).
 
 
 ## Requirements

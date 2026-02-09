@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/bash
 #SBATCH --job-name=2d_AOUPs
 #SBATCH --time=6:0:0
 #SBATCH --account=bcamley1
