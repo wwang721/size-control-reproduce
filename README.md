@@ -41,7 +41,7 @@ The code was run with **Python 3.11.11** and the following packages:
 For panel (b), the AOUP simulation code is located at [variances/NAOUPs.py](/variances/NAOUPs.py). Jobs are submitted using [script.slurm](/variances/script.slurm). The output data are written to [variances/data](/variances/data) and contain the final particle positions for each run. The figure is generated using [variance/plot.py](/variances/plot.py).
 
 > [!NOTE]
-> For small values of the persistence time $\tau$, the first few data points may exhibit increased noise because $\tau$ approaches the default integration time step $\Delta t$. In this regime, reducing the time step (using line 16 and commenting out line 13 in [NAOUPs.py](/variances/NAOUPs.py) for small $\tau$) and averaging over multiple runs is necessary to obtain reliable results.
+> For small values of the persistence time $\tau$, the first few data points may exhibit increased noise because $\tau$ approaches the integration time step $\Delta t$. In this regime, reducing the time step (using line 16/17 and commenting out line 13 in [NAOUPs.py](/variances/NAOUPs.py) for small $\tau$) and averaging over multiple runs is necessary to obtain reliable results.
 
 For panel (c), the code used to compute the mean first-passage time is located in the directory [MFPT](/MFPT). Each subdirectory corresponds to varying a single parameter. Submit the `script.slurm` file within each subdirectory to run the simulations. The resulting escape times $\tau_\mathrm{esc}$ are saved as `res.npy` files. Running [MFPT/plot.py](/MFPT/plot.py) aggregates these results and generates the figure.
 
@@ -50,12 +50,14 @@ For panel (c), the code used to compute the mean first-passage time is located i
 
 Most curves in this figure are theoretical and do not rely on simulations.
 We include only the rfKMC simulation code used to generate the numerical data points in panels (a) and (e).
-The directory [distributions](/distributions) contains scripts for generating cluster-size distributions for the three models studied in the paper, with output saved to [distributions/data](/distributions/data). Running [distributions/plot.py](/distributions/plot.py) produces panel (a). For panel (e), the corresponding simulation scripts are located in [distributions/min_N](/distributions/min_N/).
+The directory [distributions](/distributions) contains scripts for generating cluster-size distributions for the three models studied in the paper, with output saved to [distributions/data](/distributions/data). Running [distributions/plot.py](/distributions/plot.py) produces panel (a). For panel (e), the corresponding simulation scripts are located in [distributions/min_N](/distributions/min_N/). To change the value of $\gamma$, edit line 69 of [min_cluster_size.py](/distributions/min_N/min_cluster_size.py), where it is specified as the second argument in `A = Chain(1000, 0.1)`.
 
 
 ### Figure 6
 
-To perform the survival analysis for the 1D rfKMC simulations, run [survival/lineage_rupture.py](/survival/lineage_rupture.py) to generate rupture times, which are saved in [survival/data](/survival/data) (run different $k_b$ values manually). Subsequently, run [survival/plot.py](/survival/plot.py) to generate panel (a). The directory [survival/change_kd](/survival/change_kd) contains scripts in which the divisioin rate $k_d$ is varied (run different values of $k_d$ manually), corresponding to panel (b).
+Panel (a) can be reproduced using the scripts in the main [survival](/survival/) directory. Run [survival/lineage_rupture.py](/survival/lineage_rupture.py) to generate rupture times (saved in [survival/data](/survival/data)); to change the break rate $k_b$, modify line 73. Then run [survival/plot.py](/survival/plot.py) to generate panel (a).
+
+Panel (b) corresponds to varying the division rate $k_d$ and can be reproduced using the scripts in the subdirectory [survival/change_kd](/survival/change_kd). In this case, edit line 76 to change $k_d$, then run the plotting script in that subdirectory.
 
 
 ### Figure 7
@@ -66,6 +68,9 @@ The 2D AOUP simulations are located in [2D_simulations](/2D_simulations) directo
 ![2D simulation](/2D_simulations/2d_sim.gif)
 
 Submit [2D_simulations/script.slurm](/2D_simulations/script.slurm) to run [scan_va.py](/2D_simulations/scan_va.py), which scans the parameter space over the active velocity $v_a$ (denoted $v_\textrm{rms}$ in the paper) and saves the results to [2D_simulations/data](/2D_simulations/data). The scripts in [2D_simulations/analysis](/2D_simulations/analysis) process these data to generate panels in Fig. 7, including fracture rates, histograms, cluster-size distributions, and survival probabilities.
+
+> [!NOTE]
+> All the SLURM job scripts included here are provided for illustration and were tested on the Rockfish cluster (rockfish.jhu.edu); they may not work without modification on other systems. In particular, (1) module or package loading commands may differ depending on your site’s environment and default setup, and (2) performance characteristics can vary across clusters, which may require adjusting the wall times. Please adapt these scripts as needed for your local HPC configuration.
 
 
 ### Other figures

@@ -13,7 +13,8 @@ N = 1000        # Number of particles
 dt = 0.01       # Time step
 
 # Need a smaller dt for smaller tau
-# dt = 0.0001        # smaller time step
+# dt = 0.001
+# dt = 0.0001
 
 T = 1000       # Total simulation time
 steps = int(T / dt)     # Number of steps
