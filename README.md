@@ -6,7 +6,7 @@
 
 These are the code and data required to reproduce the results in the paper:
 
-- ***Controlling tissue size by active fracture***, Wei Wang (汪巍) and Brian A. Camley, [**Phys. Rev. E (2026)**](https://doi.org/10.1103/dk15-hwzg).
+- ***Controlling tissue size by active fracture***, Wei Wang (汪巍) and Brian A. Camley, [Phys. Rev. E **113**, 034405 (2026)](https://doi.org/10.1103/dk15-hwzg).
 
 Preprint version available on **arXiv**: [arXiv:2503.03126](https://doi.org/10.48550/arXiv.2503.03126).
 
