@@ -21,7 +21,16 @@ Detailed analytical derivations of the generating functions are provided in the 
 
 ## Requirements
 
-The code was run with **Python 3.11.11** and the following packages:
+The code was run with **Python 3.11.11**. A dependency list with minimum package versions is provided in [requirements.txt](./requirements.txt).
+Create a virtual environment and install the dependencies with:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+The repository uses the following packages:
 
 | Package    | Version | Usage                                                                           |
 | :--------- | :-----: | :------------------------------------------------------------------------------ |
