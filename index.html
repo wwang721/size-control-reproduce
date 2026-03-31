@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controlling Tissue Size by Active Fracture</title>
+  <meta
+    name="description"
+    content="A research webpage for 'Controlling tissue size by active fracture' by Wei Wang and Brian A. Camley."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+  <style>
+    :root {
+      --bg: #F6F2EC;
+      --bg-alt: #EDEAE3;
+      --navy: #0B1F33;
+      --navy-mid: #152D45;
+      --teal: #0C8A7B;
+      --teal-light: #3DBFB0;
+      --teal-pale: #C5EBE6;
+      --coral: #D4633A;
+      --text: #1A2B3C;
+      --muted: #607080;
+      --rule: #D5CFC5;
+      --white: #FFFFFF;
+      --font-serif: "Playfair Display", Georgia, serif;
+      --font-sans: "DM Sans", system-ui, sans-serif;
+      --font-mono: "DM Mono", "Courier New", monospace;
+      --radius: 6px;
+      --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: var(--teal); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    #nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background: rgba(11,31,51,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    #nav .nav-brand {
+      font-family: var(--font-serif);
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.02em;
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #nav ul {
+      display: flex;
+      gap: 0.25rem;
+      list-style: none;
+    }
+    #nav ul li a {
+      color: rgba(255,255,255,0.56);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border-radius: 3px;
+      transition: color 0.2s, background 0.2s;
+    }
+    #nav ul li a:hover {
+      color: var(--white);
+      background: rgba(255,255,255,0.08);
+      text-decoration: none;
+    }
+
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: var(--navy);
+      overflow: hidden;
+      padding: 7rem 2rem 5rem;
+    }
+    #hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 50%, rgba(12,138,123,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 75% 40%, rgba(12,138,123,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(11,31,51,0.6) 0%, transparent 70%);
+      animation: heroPulse 8s ease-in-out infinite alternate;
+    }
+    @keyframes heroPulse {
+      from { opacity: 0.7; transform: scale(1); }
+      to { opacity: 1; transform: scale(1.04); }
+    }
+    .hero-lines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 60px,
+        rgba(12,138,123,0.035) 60px,
+        rgba(12,138,123,0.035) 61px
+      );
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 820px;
+    }
+    .hero-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal-light);
+      background: rgba(61,191,176,0.12);
+      border: 1px solid rgba(61,191,176,0.25);
+      padding: 0.35rem 1rem;
+      border-radius: 2rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s forwards;
+    }
+    #hero h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.4s forwards;
+    }
+    #hero h1 em {
+      font-style: italic;
+      color: var(--teal-light);
+    }
+    .hero-subtitle {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.55s forwards;
+    }
+    .authors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.2rem;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.7s forwards;
+    }
+    .authors span {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 400;
+    }
+    .affiliation {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.95s forwards;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .badge:hover { transform: translateY(-2px); text-decoration: none; }
+    .badge-journal {
+      background: rgba(61,191,176,0.15);
+      border: 1px solid rgba(61,191,176,0.4);
+      color: var(--teal-light);
+    }
+    .badge-journal:hover { background: rgba(61,191,176,0.25); }
+    .badge-arxiv {
+      background: rgba(212,99,58,0.15);
+      border: 1px solid rgba(212,99,58,0.4);
+      color: #E8855E;
+    }
+    .badge-arxiv:hover { background: rgba(212,99,58,0.25); }
+    .badge-code {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.75);
+    }
+    .badge-code:hover { background: rgba(255,255,255,0.14); }
+    .badge-icon {
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .hero-summary {
+      max-width: 820px;
+      margin: 0 auto;
+      font-size: 0.98rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.52);
+      opacity: 0;
+      animation: fadeUp 0.8s 1.05s forwards;
+    }
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 1s 1.8s forwards;
+    }
+    .scroll-hint span {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      font-family: var(--font-mono);
+    }
+    .scroll-arrow {
+      width: 20px;
+      height: 20px;
+      border-right: 1.5px solid rgba(255,255,255,0.25);
+      border-bottom: 1.5px solid rgba(255,255,255,0.25);
+      transform: rotate(45deg);
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50% { transform: rotate(45deg) translateY(4px); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    #chain-viz {
+      position: absolute;
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: min(380px, 38vw);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    @keyframes breakPulse {
+      0% { opacity: 0.6; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.08); }
+    }
+    .rupture-halo { animation: breakPulse 3s ease-out infinite alternate; }
+
+    section { padding: 5rem 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .container-wide { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 1rem;
+    }
+    h2.section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+      margin-bottom: 2rem;
+    }
+    h3.subsection {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin: 2.5rem 0 0.75rem;
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s var(--transition), transform 0.7s var(--transition);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #abstract { background: var(--bg); }
+    .abstract-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .abstract-sidebar {
+      position: sticky;
+      top: 80px;
+    }
+    .tldr {
+      background: linear-gradient(135deg, rgba(12,138,123,0.1), rgba(12,138,123,0.04));
+      border-left: 3px solid var(--teal);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      margin-top: 1.5rem;
+    }
+    .tldr .label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+    .tldr p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+    .abstract-text p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+    .abstract-text p:first-child::first-letter {
+      font-family: var(--font-serif);
+      font-size: 3.8em;
+      font-weight: 700;
+      float: left;
+      line-height: 0.75;
+      margin: 0.1em 0.1em 0 0;
+      color: var(--teal);
+    }
+
+    #story { background: var(--navy); color: rgba(255,255,255,0.85); }
+    #story .section-label { color: var(--teal-light); }
+    #story h2.section-title { color: var(--white); }
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .story-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 1.75rem;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .story-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(61,191,176,0.3);
+    }
+    .story-card .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .story-card h4 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    .story-card p {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.65;
+    }
+    .challenge-box {
+      margin-top: 3rem;
+      border: 1px solid rgba(61,191,176,0.2);
+      border-radius: 8px;
+      padding: 2rem 2.5rem;
+      background: rgba(12,138,123,0.08);
+    }
+    .challenge-box p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.75);
+    }
+    .challenge-box strong { color: var(--teal-light); }
+
+    #model { background: var(--bg-alt); }
+    .states-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .state-card {
+      background: var(--white);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .state-card:hover {
+      box-shadow: 0 4px 24px rgba(11,31,51,0.08);
+      border-color: rgba(12,138,123,0.25);
+    }
+    .state-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: var(--teal);
+      color: white;
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+    .state-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .state-card strong { color: var(--navy); }
+    .eq-block {
+      background: var(--white);
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--teal);
+      border-radius: 0 6px 6px 0;
+      padding: 1.25rem 2rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .eq-block .eq-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 0.5rem;
+    }
+
+    #results { background: var(--bg-alt); }
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .regime-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .regime {
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid;
+    }
+    .regime-theory {
+      background: #EBF7F4;
+      border-color: #8ED8CE;
+    }
+    .regime-validation {
+      background: #FDF0EA;
+      border-color: #E8AA8A;
+    }
+    .regime h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .regime-theory h4 { color: var(--teal); }
+    .regime-validation h4 { color: var(--coral); }
+    .regime p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .figure-block { margin: 3rem 0; }
+    .figure-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .fig-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--white);
+      background: var(--teal);
+      padding: 0.2rem 0.7rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .fig-caption {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .fig-caption strong { color: var(--text); }
+    .fig-img {
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      background: #ffffff;
+      padding: 1rem;
+      transition: box-shadow 0.3s;
+      display: block;
+    }
+    .fig-img:hover { box-shadow: 0 8px 40px rgba(11,31,51,0.1); }
+    .fig-row {
+      display: grid;
+      gap: 1rem;
+    }
+    .fig-row-2 { grid-template-columns: 1fr 1fr; }
+    .fig-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .fig-row-4 { grid-template-columns: 1fr 1fr; }
+    .fig-row-2 .fig-img,
+    .fig-row-3 .fig-img,
+    .fig-row-4 .fig-img {
+      height: 280px;
+      object-fit: contain;
+      object-position: center;
+    }
+    .feature-figure .fig-img {
+      height: 460px;
+      object-fit: contain;
+      object-position: center;
+    }
+    .media-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .media-pair .fig-img {
+      height: 320px;
+      object-fit: contain;
+      object-position: center;
+    }
+    .hr-section {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 4rem 0;
+    }
+
+    #findings { background: var(--navy); }
+    #findings .section-label { color: var(--teal-light); }
+    #findings h2.section-title { color: var(--white); }
+    .findings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    .finding-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 2rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .finding-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--teal), var(--teal-light));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .finding-card:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(61,191,176,0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .finding-card:hover::before { opacity: 1; }
+    .finding-num {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: rgba(61,191,176,0.2);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .finding-card h4 {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+    }
+    .finding-card p {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+    }
+
+    #citation { background: var(--bg); }
+    .citation-box {
+      background: var(--white);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .citation-header {
+      background: #F0EDE6;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--rule);
+    }
+    .citation-header span {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 0.25rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover {
+      background: var(--bg);
+      color: var(--text);
+      border-color: var(--teal);
+    }
+    pre.bibtex {
+      padding: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--navy);
+      overflow-x: auto;
+      background: var(--white);
+    }
+    .bib-key { color: #7b4e96; }
+    .bib-field { color: var(--teal); }
+    .bib-val { color: var(--coral); }
+
+    footer {
+      background: var(--navy);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    footer p {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.8;
+    }
+    footer a { color: rgba(255,255,255,0.46); }
+    footer a:hover { color: var(--teal-light); }
+    .katex { font-size: 1.05em; }
+    .katex-display { margin: 1rem 0; overflow-x: auto; }
+
+    @media (max-width: 700px) {
+      #nav {
+        padding: 0 1rem;
+        overflow-x: auto;
+      }
+      #nav .nav-brand { display: none; }
+      .abstract-grid,
+      .results-grid,
+      .story-grid,
+      .findings-grid {
+        grid-template-columns: 1fr;
+      }
+      .abstract-sidebar { position: static; }
+      .states-grid,
+      .media-pair,
+      .fig-row-2,
+      .fig-row-3,
+      .fig-row-4 {
+        grid-template-columns: 1fr;
+      }
+      .media-pair .fig-img,
+      .fig-row-2 .fig-img,
+      .fig-row-3 .fig-img,
+      .fig-row-4 .fig-img,
+      .feature-figure .fig-img {
+        height: auto;
+      }
+      #chain-viz { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav id="nav">
+    <div class="nav-brand">Controlling Tissue Size by Active Fracture</div>
+    <ul>
+      <li><a href="#abstract">Abstract</a></li>
+      <li><a href="#model">Model</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#findings">Findings</a></li>
+      <li><a href="#citation">Cite</a></li>
+    </ul>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-lines"></div>
+
+    <svg id="chain-viz" viewBox="0 0 460 460" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="bondGrad" x1="40" y1="0" x2="420" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#55C6BB" stop-opacity="0.12"/>
+          <stop offset="0.52" stop-color="#D6AB58" stop-opacity="0.22"/>
+          <stop offset="1" stop-color="#C7643D" stop-opacity="0.14"/>
+        </linearGradient>
+      </defs>
+      <path d="M55 230H150M182 230H244M276 230H370" stroke="url(#bondGrad)" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="55" cy="230" r="26" fill="#55C6BB" opacity="0.35"/>
+      <circle cx="150" cy="230" r="26" fill="#55C6BB" opacity="0.35"/>
+      <circle cx="244" cy="230" r="26" fill="#55C6BB" opacity="0.35"/>
+      <circle cx="370" cy="230" r="26" fill="#55C6BB" opacity="0.35"/>
+      <circle cx="182" cy="230" r="34" stroke="#C7643D" stroke-width="2.5" opacity="0.55" class="rupture-halo"/>
+      <circle cx="182" cy="230" r="26" fill="#C7643D" opacity="0.24"/>
+      <path d="M188 208L172 252" stroke="#ffffff" stroke-opacity="0.42" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M172 208L192 252" stroke="#ffffff" stroke-opacity="0.42" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="110" cy="172" r="3.5" fill="#55C6BB" opacity="0.65"/>
+      <circle cx="132" cy="276" r="3" fill="#55C6BB" opacity="0.52"/>
+      <circle cx="305" cy="174" r="3.5" fill="#55C6BB" opacity="0.65"/>
+      <circle cx="332" cy="282" r="3" fill="#55C6BB" opacity="0.52"/>
+      <circle cx="399" cy="165" r="3" fill="#55C6BB" opacity="0.48"/>
+    </svg>
+
+    <div class="hero-content">
+      <div class="hero-label">Biophysics · Active Matter · Tissue Mechanics</div>
+      <h1>Controlling tissue size by <em>active fracture</em></h1>
+      <p class="hero-subtitle">when growth and rupture compete, mechanics becomes a size-control mechanism</p>
+
+      <div class="authors">
+        <span>Wei Wang (汪巍)</span>
+        <span>·</span>
+        <span>Brian A. Camley</span>
+      </div>
+      <p class="affiliation">Department of Physics &amp; Astronomy · Department of Biophysics · Johns Hopkins University</p>
+
+      <div class="badges">
+        <a class="badge badge-journal" href="https://doi.org/10.1103/dk15-hwzg" target="_blank" rel="noopener">
+          <span class="badge-icon">📄</span>
+          Phys. Rev. E 113, 034405 (2026)
+        </a>
+        <a class="badge badge-arxiv" href="https://arxiv.org/abs/2503.03126" target="_blank" rel="noopener">
+          <span class="badge-icon">📐</span>
+          arXiv:2503.03126
+        </a>
+        <a class="badge badge-code" href="https://github.com/wwang721/size-control-reproduce" target="_blank" rel="noopener">
+          <span class="badge-icon">⌥</span>
+          Reproduction code
+        </a>
+      </div>
+
+      <p class="hero-summary">
+        This paper builds a quantitative bridge from active cell mechanics to lineage-size statistics:
+        motility and junction rupture set an effective break rate $k_b$, and the ratio $k_b / k_d$
+        determines how large or variable a tissue-like cluster can become.
+      </p>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <section id="abstract">
+    <div class="container">
+      <div class="abstract-grid reveal">
+        <div class="abstract-sidebar">
+          <div class="section-label">Abstract</div>
+          <h2 class="section-title">Overview</h2>
+          <div class="tldr">
+            <div class="label">TL;DR</div>
+            <p>
+              The paper shows that cluster size can be controlled by a balance between cell division and
+              motility-driven fracture. It derives rupture rates from active-particle mechanics, exact
+              lineage-size distributions from stochastic growth models, and tests the picture in 2D simulations.
+            </p>
+          </div>
+        </div>
+
+        <div class="abstract-text">
+          <p>
+            Groups of cells can both grow and break apart. This paper asks what physical factors determine
+            those fractures, and what sets the eventual size distribution of a growing cluster. The starting
+            point is a one-dimensional chain of active Ornstein-Uhlenbeck particles connected by springs.
+          </p>
+          <p>
+            From that microscopic model, the paper derives how break rate depends on active speed, persistence
+            time, and junction mechanics. It then coarse-grains the problem into a lineage model where growth
+            and fracture compete. In steady state, the key control parameter becomes
+            $$\gamma = \frac{k_b}{k_d},$$
+            the ratio of fracture rate to division rate.
+          </p>
+          <p>
+            The resulting theory predicts not just mean size, but full cluster-size distributions, their
+            variability, and a striking survival law for intact clusters in the all-cells-divide case.
+            Finally, a 2D active-cluster simulation tests which pieces of the 1D theory remain accurate
+            in a more realistic geometry.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="story">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Motivation</div>
+        <h2 class="section-title">From tissue rupture to a theory of size control</h2>
+        <p style="color:rgba(255,255,255,0.6);max-width:650px;line-height:1.82;">
+          The paper is motivated by systems where fracture is not an accident but a recurring part of the
+          biology: germline cysts, multicellular clusters, and simple organisms that grow and split.
+          The question is whether random active fracture can itself regulate size.
+        </p>
+      </div>
+
+      <div class="story-grid">
+        <div class="story-card reveal" style="transition-delay:0.1s">
+          <div class="card-icon">⛓</div>
+          <h4>Mechanics</h4>
+          <p>
+            Active cells stretch the bonds that hold a cluster together. Those bond fluctuations are collective,
+            not just pairwise, so the rupture problem is already nontrivial at the mechanical level.
+          </p>
+        </div>
+        <div class="story-card reveal" style="transition-delay:0.2s">
+          <div class="card-icon">⌁</div>
+          <h4>Statistics</h4>
+          <p>
+            Once rupture is converted into a rate $k_b$, the cluster becomes a stochastic birth-fracture process.
+            Growth rules then determine whether sizes remain broad or become tightly controlled.
+          </p>
+        </div>
+        <div class="story-card reveal" style="transition-delay:0.3s">
+          <div class="card-icon">◧</div>
+          <h4>Validation</h4>
+          <p>
+            The final step is to test the 1D picture in a 2D model where cells divide, bonds break and reform,
+            and daughter clusters are selected after rupture events.
+          </p>
+        </div>
+      </div>
+
+      <div class="challenge-box reveal">
+        <p>
+          The central claim is compact: if mechanics sets the break rate $k_b$ and division sets the growth rate
+          $k_d$, then lineage-size statistics are largely organized by <strong>$\gamma = k_b / k_d$</strong>.
+          Restricting where growth happens, or where fracture can occur, can dramatically improve size control.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="model">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">The Model</div>
+        <h2 class="section-title">A chain model, a rupture law, and exact growth-fracture statistics</h2>
+        <p style="color:var(--muted);max-width:680px;line-height:1.82;margin-bottom:1.6rem;">
+          The theoretical structure of the paper has three layers: a mechanical active-particle model, a
+          coarse-grained birth-fracture lineage process, and a survival calculation at steady state.
+        </p>
+      </div>
+
+      <h3 class="subsection reveal">Three conceptual layers</h3>
+      <div class="states-grid reveal">
+        <div class="state-card">
+          <div class="state-num">1</div>
+          <p><strong>1D active chain.</strong> Cells are active Ornstein-Uhlenbeck particles linked by springs, with motion determined by active noise, persistence time $\tau$, mobility $\mu$, and stiffness $k$.</p>
+        </div>
+        <div class="state-card">
+          <div class="state-num">2</div>
+          <p><strong>Rupture rate.</strong> A stretched link escapes over a threshold barrier, yielding a Kramers-style break rate $k_b$ that depends on speed, persistence, and junction properties.</p>
+        </div>
+        <div class="state-card">
+          <div class="state-num">3</div>
+          <p><strong>Growth-fracture lineage.</strong> Cells divide at rate $k_d$ while rupture splits the cluster and one daughter lineage is retained, giving exact stationary distributions for several growth rules.</p>
+        </div>
+        <div class="state-card">
+          <div class="state-num">4</div>
+          <p><strong>Steady-state survival.</strong> In the all-cells-divide model, the intact-cluster survival probability collapses to a simple exponential controlled only by $k_d$.</p>
+        </div>
+      </div>
+
+      <h3 class="subsection reveal">Key relations</h3>
+      <div class="eq-block reveal">
+        <div class="eq-label">Control parameter</div>
+        $$\gamma = \frac{k_b}{k_d}$$
+      </div>
+      <div class="eq-block reveal">
+        <div class="eq-label">All-cell growth steady state</div>
+        $$p_n = \frac{\gamma}{(1+\gamma)^n}$$
+      </div>
+      <div class="eq-block reveal">
+        <div class="eq-label">Universal survival law for all-cell growth</div>
+        $$S(t)=e^{-k_d t}$$
+      </div>
+      <p class="reveal" style="color:var(--muted);line-height:1.82;margin-top:1rem;">
+        The paper is explicit that this survival result is conditional, not universal across every possible
+        model. It relies on the all-cell growth mechanism and on a class of fragmentation kernels with the
+        right dependence on pre-fracture cluster size.
+      </p>
+    </div>
+  </section>
+
+  <section id="results">
+    <div class="container">
+      <div class="results-grid">
+        <div>
+          <div class="section-label reveal">Results</div>
+          <h2 class="section-title reveal">Results Across Scales</h2>
+          <p class="reveal" style="color:var(--muted);line-height:1.82;">
+            The results move from microscopic rupture mechanics to lineage-size statistics, then to the
+            survival law for intact clusters, and finally to two-dimensional validation.
+          </p>
+        </div>
+
+        <div>
+          <div class="regime-cards">
+            <div class="regime regime-theory reveal" style="transition-delay:0.1s">
+              <h4>1D theory</h4>
+              <p>
+                The 1D chain yields a collective rupture rate, exact growth-fracture distributions,
+                and the steady-state survival law.
+              </p>
+            </div>
+            <div class="regime regime-validation reveal" style="transition-delay:0.2s">
+              <h4>2D validation</h4>
+              <p>
+                The 2D simulations do not directly use the 1D rupture formula. They measure an effective
+                break rate and test whether the lineage statistics still collapse onto the 1D theory.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="figure-block reveal">
+        <div class="figure-label">
+          <span class="fig-tag">Fig. 2</span>
+          <p class="fig-caption"><strong>Collective rupture mechanics in a 1D active chain.</strong> Bond fluctuations inside a long chain differ from the isolated two-particle case, and the corresponding mean-first-passage-time scans show how those fluctuations set an effective rupture rate $k_b$.</p>
+        </div>
+        <div class="media-pair">
+          <img class="fig-img" src="variances/variances.png" alt="Variance and escape time results" loading="lazy">
+          <img class="fig-img" src="MFPT/MFPT.png" alt="Mean first-passage time scans" loading="lazy">
+        </div>
+      </div>
+
+      <hr class="hr-section">
+
+      <div class="figure-block reveal">
+        <div class="figure-label">
+          <span class="fig-tag">Fig. 4</span>
+          <p class="fig-caption"><strong>Growth and fracture together set lineage-size distributions.</strong> At fixed $\gamma = k_b/k_d$, all-cell, one-end, and two-end growth produce distinct steady-state distributions. Imposing a minimum cluster size $N_\mathrm{min}$ sharpens control further by biasing fracture away from the boundary.</p>
+        </div>
+        <div class="media-pair">
+          <img class="fig-img" src="distributions/distributions.png" alt="Steady-state cluster-size distributions" loading="lazy">
+          <img class="fig-img" src="distributions/min_N/min_N.png" alt="Minimum cluster size effects on lineage statistics" loading="lazy">
+        </div>
+      </div>
+
+      <hr class="hr-section">
+
+      <div class="figure-block reveal">
+        <div class="figure-label">
+          <span class="fig-tag">Fig. 6</span>
+          <p class="fig-caption"><strong>Survival of an intact cluster has a simple steady-state form.</strong> In the all-cell-growth model, the survival probability collapses to $S(t)=e^{-k_d t}$. Varying $k_b$ leaves the curve unchanged, while varying $k_d$ rescales the decay timescale.</p>
+        </div>
+        <div class="media-pair">
+          <img class="fig-img" src="survival/survival_prob.png" alt="Survival probability curves" loading="lazy">
+          <img class="fig-img" src="survival/change_kd/survival_prob.png" alt="Survival probability for varied division rates" loading="lazy">
+        </div>
+      </div>
+
+      <hr class="hr-section">
+
+      <div class="figure-block reveal">
+        <div class="figure-label">
+          <span class="fig-tag">Fig. 7</span>
+          <p class="fig-caption"><strong>Two-dimensional simulations test which 1D results persist.</strong> The 2D model provides representative dynamics, an effective fracture rate, lineage-size distributions, summary statistics, and survival curves for direct comparison with the 1D theory.</p>
+        </div>
+        <div class="media-pair">
+          <img class="fig-img" src="2D_simulations/2d_sim.gif" alt="Two-dimensional active fracture simulation" loading="lazy">
+          <img class="fig-img" src="2D_simulations/analysis/fracture_rate.png" alt="Fracture rate versus cell speed" loading="lazy">
+        </div>
+      </div>
+
+      <div class="figure-block reveal">
+        <div class="figure-label">
+          <span class="fig-tag">Fig. 7c</span>
+          <p class="fig-caption"><strong>Lineage-size distributions in 2D.</strong> These histogram panels compare the measured 2D lineage-size distributions with the 1D theoretical form across several motility regimes.</p>
+        </div>
+        <div class="fig-row fig-row-4">
+          <img class="fig-img" src="2D_simulations/analysis/hist0.png" alt="2D histogram comparison panel 0" loading="lazy">
+          <img class="fig-img" src="2D_simulations/analysis/hist1.png" alt="2D histogram comparison panel 1" loading="lazy">
+          <img class="fig-img" src="2D_simulations/analysis/hist2.png" alt="2D histogram comparison panel 2" loading="lazy">
+          <img class="fig-img" src="2D_simulations/analysis/hist3.png" alt="2D histogram comparison panel 3" loading="lazy">
+        </div>
+      </div>
+
+      <div class="figure-block reveal">
+        <div class="figure-label">
+          <span class="fig-tag">Fig. 7d</span>
+          <p class="fig-caption"><strong>Summary statistics in 2D.</strong> Over a broad parameter range, the mean lineage size, variance, and coefficient of variation track the effective ratio $\gamma$ extracted from the 2D simulations.</p>
+        </div>
+        <div class="fig-row fig-row-3">
+          <img class="fig-img" src="2D_simulations/analysis/mean.png" alt="Mean cluster size versus gamma" loading="lazy">
+          <img class="fig-img" src="2D_simulations/analysis/variance.png" alt="Variance versus gamma" loading="lazy">
+          <img class="fig-img" src="2D_simulations/analysis/CV.png" alt="Coefficient of variation versus gamma" loading="lazy">
+        </div>
+      </div>
+
+      <div class="figure-block reveal">
+        <div class="figure-label">
+          <span class="fig-tag">Fig. 7e</span>
+          <p class="fig-caption"><strong>Survival in 2D.</strong> The measured survival curves in 2D also fall close to the exponential prediction, even though the fragment-size kernel is no longer exactly the 1D idealization used in the derivation.</p>
+        </div>
+        <div style="max-width:580px;margin:0 auto;">
+          <img class="fig-img" src="2D_simulations/analysis/survival.png" alt="Two-dimensional survival probability analysis" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="findings">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Key Findings</div>
+        <h2 class="section-title">Key Takeaways</h2>
+      </div>
+
+      <div class="findings-grid">
+        <div class="finding-card reveal" style="transition-delay:0.05s">
+          <div class="finding-num">01</div>
+          <h4>Collective rupture is not pairwise rupture</h4>
+          <p>
+            A bond embedded in a long active chain has different fluctuation statistics from a two-particle
+            link. That changes the effective escape problem and therefore the break rate.
+          </p>
+        </div>
+        <div class="finding-card reveal" style="transition-delay:0.15s">
+          <div class="finding-num">02</div>
+          <h4>$\gamma = k_b / k_d$ organizes the size statistics</h4>
+          <p>
+            Once rupture is coarse-grained into $k_b$, the steady-state lineage-size distributions are controlled
+            by the competition between fracture and division.
+          </p>
+        </div>
+        <div class="finding-card reveal" style="transition-delay:0.25s">
+          <div class="finding-num">03</div>
+          <h4>Where growth and rupture happen matters</h4>
+          <p>
+            Restricting division to the ends, or localizing rupture toward the center, tightens size control
+            compared with the fully homogeneous all-cell growth model.
+          </p>
+        </div>
+        <div class="finding-card reveal" style="transition-delay:0.35s">
+          <div class="finding-num">04</div>
+          <h4>The survival law is elegant but conditional</h4>
+          <p>
+            The exponential survival result $S(t)=e^{-k_d t}$ is exact for the all-cell growth model at
+            steady state, but it is not meant to hold for every alternative growth or rupture rule.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="citation">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Citation</div>
+        <h2 class="section-title">How to cite this work</h2>
+      </div>
+
+      <div class="citation-box reveal">
+        <div class="citation-header">
+          <span>BibTeX</span>
+          <button class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <pre class="bibtex" id="bibtexContent"><span class="bib-key">@article</span>{wang2026controlling,
+  <span class="bib-field">title</span>     = {<span class="bib-val">Controlling tissue size by active fracture</span>},
+  <span class="bib-field">author</span>    = {<span class="bib-val">Wang, Wei and Camley, Brian A.</span>},
+  <span class="bib-field">journal</span>   = {<span class="bib-val">Phys. Rev. E</span>},
+  <span class="bib-field">volume</span>    = {<span class="bib-val">113</span>},
+  <span class="bib-field">issue</span>     = {<span class="bib-val">3</span>},
+  <span class="bib-field">pages</span>     = {<span class="bib-val">034405</span>},
+  <span class="bib-field">numpages</span>  = {<span class="bib-val">20</span>},
+  <span class="bib-field">year</span>      = {<span class="bib-val">2026</span>},
+  <span class="bib-field">month</span>     = {<span class="bib-val">Mar</span>},
+  <span class="bib-field">publisher</span> = {<span class="bib-val">American Physical Society</span>},
+  <span class="bib-field">doi</span>       = {<span class="bib-val">10.1103/dk15-hwzg</span>}
+}</pre>
+      </div>
+
+      <p class="reveal" style="margin-top:1.5rem;color:var(--muted);font-size:0.88rem;">
+        Reproducible code is available at
+        <a href="https://github.com/wwang721/size-control-reproduce" target="_blank" rel="noopener">github.com/wwang721/size-control-reproduce</a>.
+        Full derivations are also available in
+        <a href="generating_functions.pdf">generating_functions.pdf</a>.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <strong style="color:rgba(255,255,255,0.5);">Controlling tissue size by active fracture</strong><br>
+      Wei Wang &amp; Brian A. Camley · Physical Review E · 2026<br>
+      <a href="https://arxiv.org/abs/2503.03126">arXiv:2503.03126</a> ·
+      <a href="https://doi.org/10.1103/dk15-hwzg">DOI:10.1103/dk15-hwzg</a> ·
+      <a href="https://github.com/wwang721/size-control-reproduce" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
+
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+    document.getElementById("copyBtn").addEventListener("click", function () {
+      const raw = `@article{wang2026controlling,
+  title     = {Controlling tissue size by active fracture},
+  author    = {Wang, Wei and Camley, Brian A.},
+  journal   = {Phys. Rev. E},
+  volume    = {113},
+  issue     = {3},
+  pages     = {034405},
+  numpages  = {20},
+  year      = {2026},
+  month     = {Mar},
+  publisher = {American Physical Society},
+  doi       = {10.1103/dk15-hwzg}
+}`;
+      navigator.clipboard.writeText(raw).then(() => {
+        this.textContent = "Copied!";
+        setTimeout(() => { this.textContent = "Copy"; }, 2000);
+      });
+    });
+
+    const sections = document.querySelectorAll("section[id]");
+    const navLinks = document.querySelectorAll("#nav ul li a");
+    const scrollSpy = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          navLinks.forEach((link) => { link.style.color = ""; });
+          const link = document.querySelector(`#nav a[href="#${entry.target.id}"]`);
+          if (link) link.style.color = "rgba(255,255,255,0.92)";
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+
+    sections.forEach((section) => scrollSpy.observe(section));
+  </script>
+</body>
+</html>
