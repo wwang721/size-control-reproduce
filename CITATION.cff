@@ -7,10 +7,10 @@ authors:
 - family-names: "Camley"
   given-names: "Brian A."
   orcid: "https://orcid.org/0000-0002-0765-6956"
-title: "size-control-reproduce"
+title: "Supplementary code and data: Controlling tissue size by active fracture"
 version: 1.0.0
 doi: 10.5281/zenodo.18485014
-date-released: 2026-2-17
+date-released: 2026-02-17
 url: "https://github.com/wwang721/size-control-reproduce"
 preferred-citation:
   type: article
